@@ -19,6 +19,7 @@ A multi-layer behavioral operating system for AI personas — including mask log
 | [Q Persona](./arkos/persona-q.md) | High-responsiveness conversational agent with adaptive tone and emotional inference |
 | [Dean O'Leary Persona](./arkos/persona-dean.md) | High-precision persona demonstrating constraint design and safety logic |
 | [Caregiver Persona](./arkos/persona-caregiver.md) | Regulation-specialist persona with trauma-informed interaction logic |
+| [Strategist Persona](./arkos/persona-strategist.md) | Systems-level thinking and decisive action specialist |
 
 ---
 
