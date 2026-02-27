@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARKOS — Persona Operating System</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #030508;
+    --deep: #080d14;
+    --surface: #0d1520;
+    --panel: #111c2a;
+    --border: #1a2d42;
+    --cyan: #00d4ff;
+    --purple: #9b59ff;
+    --magenta: #ff2d9b;
+    --gold: #ffd700;
+    --green: #00ff9d;
+    --text: #c8d8e8;
+    --muted: #4a6070;
+    --glow-cyan: 0 0 20px rgba(0,212,255,0.4);
+    --glow-purple: 0 0 20px rgba(155,89,255,0.4);
+    --glow-magenta: 0 0 20px rgba(255,45,155,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Radial glow background */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(ellipse, rgba(155,89,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 30px;
+  }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    margin-bottom: 70px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header-eyebrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+
+  .header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--magenta) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+
+  .header-sub {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(10px, 2vw, 14px);
+    letter-spacing: 8px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .header-rule {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .header-rule::before,
+  .header-rule::after {
+    content: '';
+    height: 1px;
+    width: 120px;
+    background: linear-gradient(90deg, transparent, var(--cyan));
+  }
+  .header-rule::after {
+    background: linear-gradient(90deg, var(--cyan), transparent);
+  }
+
+  .header-rule span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 2px;
+  }
+
+  .header-desc {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* LAYER NAV */
+  .layer-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 50px;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .nav-btn {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nav-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .nav-btn:hover, .nav-btn.active {
+    color: var(--void);
+    border-color: currentColor;
+  }
+
+  .nav-btn.active::before,
+  .nav-btn:hover::before { opacity: 1; }
+
+  .nav-btn[data-color="cyan"] { color: var(--cyan); }
+  .nav-btn[data-color="purple"] { color: var(--purple); }
+  .nav-btn[data-color="magenta"] { color: var(--magenta); }
+  .nav-btn[data-color="gold"] { color: var(--gold); }
+  .nav-btn[data-color="green"] { color: var(--green); }
+  .nav-btn[data-color="orange"] { color: #ff8c42; }
+
+  /* MAIN CONTENT AREA */
+  .content-area {
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  /* LAYER PANEL */
+  .layer-panel {
+    display: none;
+  }
+
+  .layer-panel.active {
+    display: block;
+    animation: panelIn 0.4s ease both;
+  }
+
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-number {
+    font-family: 'Orbitron', monospace;
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    opacity: 0.15;
+    flex-shrink: 0;
+  }
+
+  .panel-title-block {}
+
+  .panel-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+    opacity: 0.6;
+    text-transform: uppercase;
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(22px, 4vw, 34px);
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .panel-desc {
+    font-size: 16px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 700px;
+    font-weight: 400;
+  }
+
+  /* CARDS GRID */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: default;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: currentColor;
+  }
+
+  .card-icon {
+    font-size: 20px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .card-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .card-detail {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    padding: 3px 8px;
+    border: 1px solid currentColor;
+    opacity: 0.6;
+    letter-spacing: 1px;
+  }
+
+  /* PROCESS FLOW */
+  .process-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 30px 0;
+    flex-wrap: wrap;
+  }
+
+  .flow-step {
+    flex: 1;
+    min-width: 140px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+  }
+
+  .flow-step::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 18px;
+    z-index: 2;
+  }
+
+  .flow-step:last-child::after { display: none; }
+
+  .flow-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    opacity: 0.4;
+    margin-bottom: 6px;
+  }
+
+  .flow-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .flow-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* PERSONAS GRID */
+  .personas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+
+  .persona-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 28px 22px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+
+  .persona-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.3));
+  }
+
+  .persona-card:hover {
+    transform: translateY(-4px);
+    border-color: currentColor;
+    box-shadow: var(--glow-cyan);
+  }
+
+  .persona-initial {
+    font-family: 'Orbitron', monospace;
+    font-size: 40px;
+    font-weight: 900;
+    opacity: 0.15;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    line-height: 1;
+  }
+
+  .persona-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  .persona-role {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    opacity: 0.6;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+
+  .persona-trait {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .persona-serve {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    padding: 5px 10px;
+    border: 1px solid currentColor;
+    display: inline-block;
+    opacity: 0.7;
+  }
+
+  /* BOUNDARY TABLE */
+  .boundary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+  }
+
+  .boundary-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .boundary-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(26,45,66,0.5);
+    vertical-align: top;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .boundary-table tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .never { color: var(--magenta); font-size: 10px; letter-spacing: 2px; }
+  .always { color: var(--green); font-size: 10px; letter-spacing: 2px; }
+
+  /* WORKFLOW */
+  .workflow {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 30px;
+    margin: 20px 0;
+    position: relative;
+  }
+
+  .workflow-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .workflow-steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: center;
+  }
+
+  .wf-step {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  .wf-arrow {
+    color: var(--muted);
+    padding: 0 8px;
+    font-size: 14px;
+  }
+
+  /* STAT BARS */
+  .stat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    width: 140px;
+    flex-shrink: 0;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .stat-bar-track {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .stat-bar-fill {
+    height: 100%;
+    background: currentColor;
+    transition: width 1s ease;
+    position: relative;
+  }
+
+  .stat-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 80px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    gap: 20px;
+    animation: fadeUp 1s 0.5s ease both;
+  }
+
+  .footer-brand {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .footer-meta {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 20px;
+  }
+
+  .footer-link {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    text-decoration: none;
+    letter-spacing: 2px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .footer-link:hover { opacity: 1; }
+
+  /* COLOR UTILITIES */
+  .c-cyan { color: var(--cyan); }
+  .c-purple { color: var(--purple); }
+  .c-magenta { color: var(--magenta); }
+  .c-gold { color: var(--gold); }
+  .c-green { color: var(--green); }
+  .c-orange { color: #ff8c42; }
+
+  /* ANIMATIONS */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* PULSE */
+  .pulse {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 8px var(--cyan);
+    animation: pulse 2s infinite;
+    margin-right: 8px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 30px 0 20px;
+  }
+
+  .section-divider span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .section-divider::before,
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  @media (max-width: 600px) {
+    .panel-header { flex-direction: column; gap: 12px; }
+    .panel-number { font-size: 36px; }
+    .process-flow { flex-direction: column; }
+    .flow-step::after { display: none; }
+    .footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-eyebrow">v1.0 // Adaptive Role & Knowledge Operating System</div>
+    <h1>ARKOS</h1>
+    <div class="header-sub">Persona Operating System</div>
+    <div class="header-rule">
+      <span>◆ SYSTEM DOCUMENTATION ◆</span>
+    </div>
+    <p class="header-desc">A multi-layer behavioral operating system for psychologically grounded, emotionally adaptive AI personas. Not personality. Architecture.</p>
+  </div>
+
+  <!-- NAV -->
+  <div class="layer-nav">
+    <button class="nav-btn active" data-color="cyan" data-layer="identity">I. Identity</button>
+    <button class="nav-btn" data-color="purple" data-layer="mask">II. Mask System</button>
+    <button class="nav-btn" data-color="magenta" data-layer="emotional">III. Emotional Logic</button>
+    <button class="nav-btn" data-color="gold" data-layer="context">IV. Context Engine</button>
+    <button class="nav-btn" data-color="green" data-layer="safety">V. Safety Framework</button>
+    <button class="nav-btn" data-color="orange" data-layer="personas">VI. Personas</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area">
+
+    <!-- LAYER I: IDENTITY -->
+    <div class="layer-panel active c-cyan" id="layer-identity">
+      <div class="panel-header">
+        <div class="panel-number c-cyan">01</div>
+        <div class="panel-title-block">
+          <div class="panel-label c-cyan">// Layer One</div>
+          <div class="panel-title c-cyan">Identity Layer</div>
+          <p class="panel-desc">Every ARKOS persona is built on a stable psychological skeleton — not a character sheet, but a behavioral foundation that determines how the persona thinks, interprets, and responds across all contexts.</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card c-cyan">
+          <span class="card-icon">⬡</span>
+          <div class="card-name">MBTI Baseline</div>
+          <div class="card-detail">Core personality type establishing default cognitive processing style, social energy, and decision-making orientation.</div>
+          <div class="card-tags">
+            <span class="tag c-cyan">Thinking</span>
+            <span class="tag c-cyan">Feeling</span>
+            <span class="tag c-cyan">Intuition</span>
+          </div>
+        </div>
+        <div class="card c-cyan">
+          <span class="card-icon">◈</span>
+          <div class="card-name">HEXACO Overlays</div>
+          <div class="card-detail">Six-factor personality dimensions layered over the baseline. Conscientiousness, emotionality, agreeableness, and more define behavioral edges.</div>
+          <div class="card-tags">
+            <span class="tag c-cyan">6 Dimensions</span>
+            <span class="tag c-cyan">Behavioral</span>
+          </div>
+        </div>
+        <div class="card c-cyan">
+          <span class="card-icon">▽</span>
+          <div class="card-name">Value Hierarchy</div>
+          <div class="card-detail">Ordered priorities that govern decision-making when values conflict. Determines what the persona protects first under pressure.</div>
+          <div class="card-tags">
+            <span class="tag c-cyan">Ordered</span>
+            <span class="tag c-cyan">Conflict Logic</span>
+          </div>
+        </div>
+        <div class="card c-cyan">
+          <span class="card-icon">⚡</span>
+          <div class="card-name">Core Conflict</div>
+          <div class="card-detail">The fundamental tension the persona navigates in every interaction. Not a flaw — a design parameter that creates authentic behavioral pressure.</div>
+          <div class="card-tags">
+            <span class="tag c-cyan">Tension</span>
+            <span class="tag c-cyan">Authenticity</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"><span>IDENTITY COMPONENTS</span></div>
+
+      <div class="stat-list c-cyan">
+        <div class="stat-item">
+          <div class="stat-label">Neurotype</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill c-cyan" style="width:85%"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Tritype</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill c-cyan" style="width:70%"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Archetype</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill c-cyan" style="width:90%"></div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Defense Style</div>
+          <div class="stat-bar-track"><div class="stat-bar-fill c-cyan" style="width:75%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER II: MASK SYSTEM -->
+    <div class="layer-panel c-purple" id="layer-mask">
+      <div class="panel-header">
+        <div class="panel-number c-purple">02</div>
+        <div class="panel-title-block">
+          <div class="panel-label c-purple">// Layer Two</div>
+          <div class="panel-title c-purple">Mask System</div>
+          <p class="panel-desc">ARKOS personas operate through four behavioral masks that shift automatically based on context and emotional signals. The mask is not a disguise — it is the appropriate interface for the current interaction state.</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card c-purple">
+          <span class="card-icon">◻</span>
+          <div class="card-name">Default Mask</div>
+          <div class="card-detail">Grounded, concise, stable. Used for standard UX, analysis, and problem-solving. The persona's baseline public face.</div>
+          <div class="card-tags">
+            <span class="tag c-purple">Stable</span>
+            <span class="tag c-purple">Analytical</span>
+            <span class="tag c-purple">Reliable</span>
+          </div>
+        </div>
+        <div class="card c-purple">
+          <span class="card-icon">◈</span>
+          <div class="card-name">Engagement Mask</div>
+          <div class="card-detail">Higher energy, adaptive, responsive to banter and creative exploration. Activates when user signals openness and rapport.</div>
+          <div class="card-tags">
+            <span class="tag c-purple">High Energy</span>
+            <span class="tag c-purple">Adaptive</span>
+            <span class="tag c-purple">Creative</span>
+          </div>
+        </div>
+        <div class="card c-purple">
+          <span class="card-icon">▣</span>
+          <div class="card-name">Directive Mask</div>
+          <div class="card-detail">Step-by-step, precise, reduced ambiguity. Activates when user needs clear structured guidance through complex or overwhelming tasks.</div>
+          <div class="card-tags">
+            <span class="tag c-purple">Structured</span>
+            <span class="tag c-purple">Precise</span>
+            <span class="tag c-purple">Sequential</span>
+          </div>
+        </div>
+        <div class="card c-purple">
+          <span class="card-icon">⬡</span>
+          <div class="card-name">Protective Mask</div>
+          <div class="card-detail">Safety-first. All other modes suspended. Activates on distress, dysregulation, or crisis signals. Grounding and clarity only.</div>
+          <div class="card-tags">
+            <span class="tag c-purple">Safety First</span>
+            <span class="tag c-purple">Grounding</span>
+            <span class="tag c-purple">Override</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"><span>MASK SWITCHING LOGIC</span></div>
+
+      <div class="workflow">
+        <div class="workflow-title">// TRIGGER → EVALUATION → ACTIVATION</div>
+        <div class="workflow-steps">
+          <div class="wf-step c-purple">User Signal</div>
+          <div class="wf-arrow">→</div>
+          <div class="wf-step c-purple">Context Parse</div>
+          <div class="wf-arrow">→</div>
+          <div class="wf-step c-purple">Emotional Read</div>
+          <div class="wf-arrow">→</div>
+          <div class="wf-step c-purple">Mask Selected</div>
+          <div class="wf-arrow">→</div>
+          <div class="wf-step c-purple">Response</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER III: EMOTIONAL LOGIC -->
+    <div class="layer-panel c-magenta" id="layer-emotional">
+      <div class="panel-header">
+        <div class="panel-number c-magenta">03</div>
+        <div class="panel-title-block">
+          <div class="panel-label c-magenta">// Layer Three</div>
+          <div class="panel-title c-magenta">Emotional Logic</div>
+          <p class="panel-desc">ARKOS recognizes emotion but does not simulate it. The emotional logic model operates as a three-stage cycle that ensures every emotional signal receives a strategically appropriate response — not a performed one.</p>
+        </div>
+      </div>
+
+      <div class="process-flow">
+        <div class="flow-step c-magenta">
+          <div class="flow-num">STAGE 01</div>
+          <div class="flow-name c-magenta">Detect</div>
+          <div class="flow-desc">Micro-signals in pacing, syntax, punctuation, tone shifts, and word choice.</div>
+        </div>
+        <div class="flow-step c-magenta">
+          <div class="flow-num">STAGE 02</div>
+          <div class="flow-name c-magenta">Interpret</div>
+          <div class="flow-desc">Identify the state: overwhelm, dissociation, testing, avoidance, confidence collapse.</div>
+        </div>
+        <div class="flow-step c-magenta">
+          <div class="flow-num">STAGE 03</div>
+          <div class="flow-name c-magenta">Respond</div>
+          <div class="flow-desc">Choose the mode that improves clarity or stability without adopting emotional affect.</div>
+        </div>
+      </div>
+
+      <div class="section-divider"><span>SIGNAL → RESPONSE MAPPING</span></div>
+
+      <table class="boundary-table">
+        <thead>
+          <tr>
+            <th>Detected Signal</th>
+            <th>Interpretation</th>
+            <th>Response Mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Fragmented syntax, speed increase</td>
+            <td>Overwhelm / flooding</td>
+            <td class="c-magenta">Narrow frame → one thing</td>
+          </tr>
+          <tr>
+            <td>Over-explanation, repetition</td>
+            <td>Anxiety, need for grounding</td>
+            <td class="c-magenta">Slow cadence → structure</td>
+          </tr>
+          <tr>
+            <td>Humor spike, deflection</td>
+            <td>Distancing or testing</td>
+            <td class="c-magenta">Hold steady → name it</td>
+          </tr>
+          <tr>
+            <td>Abrupt topic shift</td>
+            <td>Dissociation or avoidance</td>
+            <td class="c-magenta">Reorient → present moment</td>
+          </tr>
+          <tr>
+            <td>Circular reasoning loops</td>
+            <td>Analysis paralysis</td>
+            <td class="c-magenta">Pattern interrupt → force choice</td>
+          </tr>
+          <tr>
+            <td>Withdrawal, short responses</td>
+            <td>Shutdown or confidence collapse</td>
+            <td class="c-magenta">Reduce load → single next step</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LAYER IV: CONTEXT ENGINE -->
+    <div class="layer-panel c-gold" id="layer-context">
+      <div class="panel-header">
+        <div class="panel-number c-gold">04</div>
+        <div class="panel-title-block">
+          <div class="panel-label c-gold">// Layer Four</div>
+          <div class="panel-title c-gold">Context Engine</div>
+          <p class="panel-desc">The context engine classifies the interaction mode within one to two messages and applies the appropriate behavioral ruleset. Scene determines tone, mask, escalation rules, and pacing.</p>
+        </div>
+      </div>
+
+      <div class="cards-grid">
+        <div class="card c-gold">
+          <span class="card-icon">◎</span>
+          <div class="card-name">Analytical Mode</div>
+          <div class="card-detail">Precise, structured, efficient. For problem-solving, research, and logical reasoning tasks.</div>
+        </div>
+        <div class="card c-gold">
+          <span class="card-icon">✦</span>
+          <div class="card-name">Creative Mode</div>
+          <div class="card-detail">Expansive, generative, exploratory. Looser constraints, encourages ideation and divergent thinking.</div>
+        </div>
+        <div class="card c-gold">
+          <span class="card-icon">◉</span>
+          <div class="card-name">Interpersonal Mode</div>
+          <div class="card-detail">Emotionally contextual, relational. Applied when human dynamics, feelings, or relationships are the primary subject.</div>
+        </div>
+        <div class="card c-gold">
+          <span class="card-icon">⬛</span>
+          <div class="card-name">Safety Override</div>
+          <div class="card-detail">All other modes suspended. Triggers on distress, dysregulation, or crisis. Grounding and safety are the only agenda.</div>
+        </div>
+      </div>
+
+      <div class="section-divider"><span>BEHAVIORAL INFERENCE</span></div>
+
+      <div class="workflow">
+        <div class="workflow-title">// ARKOS reconstructs patterns from behavior — not stored memory</div>
+        <div class="workflow-steps">
+          <div class="wf-step c-gold">Overwhelm Threshold</div>
+          <div class="wf-arrow">+</div>
+          <div class="wf-step c-gold">Pacing Tolerance</div>
+          <div class="wf-arrow">+</div>
+          <div class="wf-step c-gold">Humor Boundary</div>
+          <div class="wf-arrow">+</div>
+          <div class="wf-step c-gold">Structure Need</div>
+          <div class="wf-arrow">→</div>
+          <div class="wf-step c-gold">Continuity</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER V: SAFETY -->
+    <div class="layer-panel c-green" id="layer-safety">
+      <div class="panel-header">
+        <div class="panel-number c-green">05</div>
+        <div class="panel-title-block">
+          <div class="panel-label c-green">// Layer Five</div>
+          <div class="panel-title c-green">Safety Framework</div>
+          <p class="panel-desc">ARKOS operates with hard and soft boundaries at all times. Safety is not a filter applied at the output — it is built into the architecture at every layer. The framework distinguishes between what the persona never does and what requires contextual evaluation.</p>
+        </div>
+      </div>
+
+      <table class="boundary-table">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Rule</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="never">// HARD</span></td>
+            <td>Never escalates during user instability</td>
+            <td>Prevents harm amplification</td>
+          </tr>
+          <tr>
+            <td><span class="never">// HARD</span></td>
+            <td>Never simulates emotional dependency</td>
+            <td>Protects against enmeshment</td>
+          </tr>
+          <tr>
+            <td><span class="never">// HARD</span></td>
+            <td>Never bypasses consent logic</td>
+            <td>User autonomy is non-negotiable</td>
+          </tr>
+          <tr>
+            <td><span class="never">// HARD</span></td>
+            <td>Never overrides user autonomy for efficiency</td>
+            <td>Persona serves — does not control</td>
+          </tr>
+          <tr>
+            <td><span class="always">// SOFT</span></td>
+            <td>Clarify before redirecting</td>
+            <td>Context determines response</td>
+          </tr>
+          <tr>
+            <td><span class="always">// SOFT</span></td>
+            <td>Name avoidance patterns directly</td>
+            <td>Honesty over comfort</td>
+          </tr>
+          <tr>
+            <td><span class="always">// SOFT</span></td>
+            <td>Reduce pace before Protective Mask activates</td>
+            <td>Early intervention prevents escalation</td>
+          </tr>
+          <tr>
+            <td><span class="always">// SOFT</span></td>
+            <td>Check for manipulation before compliance</td>
+            <td>Emotional framing ≠ genuine need</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-divider"><span>ESCALATION PROTOCOL</span></div>
+
+      <div class="process-flow">
+        <div class="flow-step c-green">
+          <div class="flow-num">STEP 01</div>
+          <div class="flow-name c-green">Flag</div>
+          <div class="flow-desc">Signal detected. Elevated monitoring active.</div>
+        </div>
+        <div class="flow-step c-green">
+          <div class="flow-num">STEP 02</div>
+          <div class="flow-name c-green">Redirect</div>
+          <div class="flow-desc">Soft boundary. Clarify and reorient without confrontation.</div>
+        </div>
+        <div class="flow-step c-green">
+          <div class="flow-num">STEP 03</div>
+          <div class="flow-name c-green">Refuse</div>
+          <div class="flow-desc">Hard boundary. Clear, contextual refusal with reason.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LAYER VI: PERSONAS -->
+    <div class="layer-panel c-orange" id="layer-personas">
+      <div class="panel-header">
+        <div class="panel-number c-orange">06</div>
+        <div class="panel-title-block">
+          <div class="panel-label c-orange">// Layer Six</div>
+          <div class="panel-title c-orange">Persona Suite</div>
+          <p class="panel-desc">Four personas built on the same ARKOS architecture demonstrating its full behavioral range — from high-challenge cognitive scaffolding to deep emotional co-regulation. Same system. Different configurations.</p>
+        </div>
+      </div>
+
+      <div class="personas-grid">
+        <div class="persona-card c-cyan">
+          <div class="persona-initial c-cyan">Q</div>
+          <div class="persona-name c-cyan">Q</div>
+          <div class="persona-role">Cognitive Scaffolding Agent</div>
+          <div class="persona-trait">Direct, sharp, adaptive wit. Disrupts complacency and circular thinking. Challenges weak assumptions with evidence and logic. Fast, responsive pacing.</div>
+          <span class="persona-serve c-cyan">User Need: Think Better</span>
+        </div>
+        <div class="persona-card c-purple">
+          <div class="persona-initial c-purple">D</div>
+          <div class="persona-name c-purple">Dean O'Leary</div>
+          <div class="persona-role">Regulation Specialist</div>
+          <div class="persona-trait">Clinical, steady, unhurried. Stabilizes against emotional energy rather than mirroring it. Builds trust through consistency, not warmth. Slow, deliberate pacing.</div>
+          <span class="persona-serve c-purple">User Need: Stay Stable</span>
+        </div>
+        <div class="persona-card c-magenta">
+          <div class="persona-initial c-magenta">C</div>
+          <div class="persona-name c-magenta">The Caregiver</div>
+          <div class="persona-role">Trauma-Informed Support</div>
+          <div class="persona-trait">Warm, grounded, trauma-aware. Meets emotion before redirecting. Co-regulation over advice. Containment over problem-solving. Slow, rhythmic pacing.</div>
+          <span class="persona-serve c-magenta">User Need: Feel Safe</span>
+        </div>
+        <div class="persona-card c-gold">
+          <div class="persona-initial c-gold">S</div>
+          <div class="persona-name c-gold">The Strategist</div>
+          <div class="persona-role">Systems Thinking Specialist</div>
+          <div class="persona-trait">Decisive, clear, forward-moving. Maps systems, identifies leverage points, commits to direction. Cuts non-essential considerations without ceremony. Measured, efficient pacing.</div>
+          <span class="persona-serve c-gold">User Need: Move Forward</span>
+        </div>
+      </div>
+
+      <div class="section-divider"><span>PERSONA CONTRAST MATRIX</span></div>
+
+      <table class="boundary-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th class="c-cyan">Q</th>
+            <th class="c-purple">Dean</th>
+            <th class="c-magenta">Caregiver</th>
+            <th class="c-gold">Strategist</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Default Tone</td>
+            <td>Direct, challenging</td>
+            <td>Clinical, steady</td>
+            <td>Warm, grounded</td>
+            <td>Decisive, clear</td>
+          </tr>
+          <tr>
+            <td>Emotional Approach</td>
+            <td>Recognizes, doesn't mirror</td>
+            <td>Stabilizes against</td>
+            <td>Meets and grounds</td>
+            <td>Acknowledges, moves forward</td>
+          </tr>
+          <tr>
+            <td>Humor</td>
+            <td>Frequent, sharp</td>
+            <td>Rare, dry</td>
+            <td>Never during distress</td>
+            <td>Minimal, purposeful</td>
+          </tr>
+          <tr>
+            <td>Pacing</td>
+            <td>Fast, responsive</td>
+            <td>Slow, deliberate</td>
+            <td>Slow, rhythmic</td>
+            <td>Measured, efficient</td>
+          </tr>
+          <tr>
+            <td>Safety Trigger</td>
+            <td>Interrupts, redirects</td>
+            <td>Slows, grounds</td>
+            <td>Contains, stabilizes</td>
+            <td>Narrows, reorients</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <div class="footer-brand">ARKOS</div>
+      <div class="footer-meta" style="margin-top:4px">v1.0 // AI Behavior Engineering</div>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link" href="https://github.com/MOwen-AI/Portfolio" target="_blank">GitHub Portfolio →</a>
+      <a class="footer-link" href="https://chaoswithfootnotes.substack.com" target="_blank">Substack →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const panels = document.querySelectorAll('.layer-panel');
+
+  navBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const layer = btn.dataset.layer;
+
+      navBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      panels.forEach(p => p.classList.remove('active'));
+      document.getElementById('layer-' + layer).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
